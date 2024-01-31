@@ -1,6 +1,8 @@
 import io
 
-from flask import Flask, request, send_file
+import cv2
+import numpy as np
+from flask import Flask, make_response, request
 
 app = Flask(__name__)
 
@@ -9,4 +11,11 @@ app = Flask(__name__)
 def googly_eyes():
     """Receive an image and return the same image with googly eyes."""
     file = request.files["file"]
-    return send_file(io.BytesIO(file.read()), mimetype="image/jpeg")
+
+    file_bytes = np.fromfile(file, np.uint8)
+    gray_image = cv2.imdecode(file_bytes, cv2.IMREAD_GRAYSCALE)
+    _, buffer = cv2.imencode(".jpg", gray_image)
+
+    response = make_response(buffer.tobytes())
+    response.headers["Content-Type"] = "image/jpeg"
+    return response
