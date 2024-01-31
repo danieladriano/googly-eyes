@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "googly-eyes"
+version = "0.1.0"
+description = "Googly Eyes"
+authors = ["Daniel Adriano <daniel.dadriano@gmail.com>"]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
