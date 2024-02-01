@@ -7,37 +7,14 @@ import cv2
 import numpy as np
 from flask import Flask, make_response, request
 
+from model.cascade_classifier import CascadeClassifier
+
 app = Flask(__name__)
-face_cascade = cv2.CascadeClassifier("./model/haarcascade_frontalface_default.xml")
-eyes_cascade = cv2.CascadeClassifier("./model/haarcascade_eye.xml")
 
-
-def detect_faces(gray_image: np.ndarray) -> np.ndarray:
-    """Detect faces in a gray image.
-
-    Args:
-        gray_image (np.ndarray): A gray image to detect faces.
-
-    Returns:
-        np.ndarray: An array of faces (x, y, w, h)
-    """
-    return face_cascade.detectMultiScale(
-        image=gray_image, scaleFactor=1.3, minNeighbors=5
-    )
-
-
-def detect_eyes(gray_image: np.ndarray) -> np.ndarray:
-    """Detect eyes in a gray image.
-
-    Args:
-        gray_image (np.ndarray): A gray image to detect eyes.
-
-    Returns:
-        np.ndarray: An array of eyes (x, y, w, h)
-    """
-    return eyes_cascade.detectMultiScale(
-        image=gray_image, scaleFactor=1.2, minNeighbors=5
-    )
+cascade_classifier = CascadeClassifier(
+    face_model_path="./data/haarcascade_frontalface_default.xml",
+    eyes_model_path="./data/haarcascade_eye.xml",
+)
 
 
 def draw_googly_eyes(image: np.ndarray, eyes: np.ndarray) -> np.ndarray:
@@ -85,11 +62,11 @@ def get_image_with_faces(image: np.ndarray) -> np.ndarray:
         np.ndarray: image with faces detected.
     """
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    faces = detect_faces(gray_image=gray_image)
+    faces = cascade_classifier.detect_faces(gray_image=gray_image)
     for x, y, w, h in faces:
         roi_gray_image = gray_image[y : y + h, x : x + w]
         roi_image = image[y : y + h, x : x + w]
-        eyes = detect_eyes(gray_image=roi_gray_image)
+        eyes = cascade_classifier.detect_eyes(gray_image=roi_gray_image)
         draw_googly_eyes(image=roi_image, eyes=eyes)
     return image
 
