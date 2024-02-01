@@ -17,21 +17,15 @@ cascade_classifier = CascadeClassifier(
 )
 
 
-def draw_googly_eyes(image: np.ndarray, eyes: np.ndarray) -> np.ndarray:
+def draw_googly_eyes(image: np.ndarray, eyes: np.ndarray) -> None:
     """Draw googly eyes in an image.
 
     Args:
         image (np.ndarray): image to draw googly eyes.
         eyes (np.ndarray): eyes coordinates.
-
-    Returns:
-        np.ndarray: image with googly eyes.
     """
-    image_h = np.size(image, 0)
     for x, y, w, h in eyes:
         try:
-            if y + h > image_h / 2:
-                pass
             center = (int(x + w / 2), int(y + h / 2))
             radius = int(w * (0.7 + random.random()))
             cv2.circle(
@@ -52,14 +46,11 @@ def draw_googly_eyes(image: np.ndarray, eyes: np.ndarray) -> np.ndarray:
             logging.error("Error drawing eyes: %s", ex)
 
 
-def get_image_with_faces(image: np.ndarray) -> np.ndarray:
-    """Return the input image with faces detected.
+def get_googly_eyes(image: np.ndarray) -> np.ndarray:
+    """Detect faces and eyes in an image and draw googly eyes.
 
     Args:
-        image (np.ndarray): image to detect faces.
-
-    Returns:
-        np.ndarray: image with faces detected.
+        image (np.ndarray): image.
     """
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     faces = cascade_classifier.detect_faces(gray_image=gray_image)
@@ -68,7 +59,6 @@ def get_image_with_faces(image: np.ndarray) -> np.ndarray:
         roi_image = image[y : y + h, x : x + w]
         eyes = cascade_classifier.detect_eyes(gray_image=roi_gray_image)
         draw_googly_eyes(image=roi_image, eyes=eyes)
-    return image
 
 
 @app.route("/googly_eyes", methods=["POST"])
@@ -79,8 +69,8 @@ def googly_eyes():
     file_bytes = np.fromfile(file, np.uint8)
     image = cv2.imdecode(file_bytes, cv2.IMREAD_UNCHANGED)
 
-    image_with_faces = get_image_with_faces(image=image)
-    _, buffer = cv2.imencode(".jpg", image_with_faces)
+    get_googly_eyes(image=image)
+    _, buffer = cv2.imencode(".jpg", image)
 
     response = make_response(buffer.tobytes())
     response.headers["Content-Type"] = "image/jpeg"
