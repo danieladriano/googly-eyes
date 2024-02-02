@@ -1,0 +1,3 @@
+app_config:
+  face_model_path: "haarcascade_frontalface_default.xml"
+  eyes_model_path: "haarcascade_eye.xml"

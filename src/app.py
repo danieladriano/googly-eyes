@@ -4,11 +4,13 @@ import cv2
 import numpy as np
 from flask import Flask, Response, make_response, request
 
-from src.googly_eyes import googlify
+from src.config import AppConfig
+from src.googly_eyes import Googlify
 
 ALLOWED_EXTENSIONS = ("png", "jpg", "jpeg")
 
 app = Flask(__name__)
+googlify = Googlify(config=AppConfig.load())
 
 
 def allowed_file(filename: str) -> bool:
@@ -40,11 +42,7 @@ def googly_eyes():
             status=415,
         )
 
-    file_bytes = np.fromfile(file, np.uint8)
-    image = cv2.imdecode(file_bytes, cv2.IMREAD_UNCHANGED)
-    googlified_image = googlify(image=image)
-    _, buffer = cv2.imencode(".jpg", googlified_image)
-
+    buffer = googlify.googlify(image_file=file)
     response = make_response(buffer.tobytes())
     response.headers["Content-Type"] = "image/jpeg"
     return response

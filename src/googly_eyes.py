@@ -1,30 +1,41 @@
 """Googlify eyes"""
 
-import logging
 import random
+from typing import List
 
 import cv2
 import numpy as np
+from werkzeug.datastructures import FileStorage
 
+from src.config import AppConfig
 from src.model.cascade_classifier import CascadeClassifier
 
-cascade_classifier = CascadeClassifier(
-    face_model_path="./data/haarcascade_frontalface_default.xml",
-    eyes_model_path="./data/haarcascade_eye.xml",
-)
 
+class Googlify:
+    """Googlify eyes images"""
 
-def draw_googly_eyes(image: np.ndarray, eyes: np.ndarray) -> None:
-    """Draw googly eyes in an image.
+    def __init__(self, config: AppConfig) -> None:
+        self._cascade_classifier = CascadeClassifier(
+            face_model_path=config.face_model_path,
+            eyes_model_path=config.eyes_model_path,
+        )
 
-    Args:
-        image (np.ndarray): image to draw googly eyes.
-        eyes (np.ndarray): eyes coordinates.
-    """
-    for x, y, w, h in eyes:
-        try:
-            center = (int(x + w / 2), int(y + h / 2))
-            radius = int(w * (0.7 + random.random()))
+    def _draw_googly_eyes(self, image: np.ndarray, eyes: np.ndarray) -> None:
+        """Draw googly eyes in an image.
+
+        Args:
+            image (np.ndarray): image to draw googly eyes.
+            eyes (np.ndarray): eyes coordinates.
+        """
+        for x, y, w, h in eyes:
+
+            try:
+                center = (int(x + w / 2), int(y + h / 2))
+                radius = int(w * (0.7 + random.random()))
+            except ArithmeticError:
+                center = (x, y)
+                radius = w
+
             cv2.circle(
                 img=image,
                 center=center,
@@ -39,22 +50,31 @@ def draw_googly_eyes(image: np.ndarray, eyes: np.ndarray) -> None:
                 color=(0, 0, 0),
                 thickness=-1,
             )
-        except Exception as ex:
-            logging.error("Error drawing eyes: %s", ex)
 
+    def _get_face_image(self, face: np.ndarray, image: np.ndarray) -> np.ndarray:
+        (x, y, w, h) = face
+        return image[y : y + h, x : x + w]
 
-def googlify(image: np.ndarray) -> np.ndarray:
-    """Detect faces and eyes in an image and draw googly eyes.
+    def _get_eyes(self, face: np.ndarray, gray_image: np.ndarray) -> List[np.ndarray]:
+        roi_gray_image = self._get_face_image(face=face, image=gray_image)
+        return self._cascade_classifier.detect_eyes(gray_image=roi_gray_image)
 
-    Args:
-        image (np.ndarray): image.
-    """
-    image_copy = image.copy()
-    gray_image = cv2.cvtColor(image_copy, cv2.COLOR_BGR2GRAY)
-    faces = cascade_classifier.detect_faces(gray_image=gray_image)
-    for x, y, w, h in faces:
-        roi_gray_image = gray_image[y : y + h, x : x + w]
-        roi_image = image_copy[y : y + h, x : x + w]
-        eyes = cascade_classifier.detect_eyes(gray_image=roi_gray_image)
-        draw_googly_eyes(image=roi_image, eyes=eyes)
-    return image_copy
+    def googlify(self, image_file: FileStorage) -> np.ndarray:
+        """Detect faces and eyes in an image and draw googly eyes.
+
+        Args:
+            image (np.ndarray): image.
+        """
+        image_bytes = np.fromfile(image_file, np.uint8)
+        image = cv2.imdecode(image_bytes, cv2.IMREAD_UNCHANGED)
+
+        image_copy = image.copy()
+        gray_image = cv2.cvtColor(image_copy, cv2.COLOR_BGR2GRAY)
+        faces = self._cascade_classifier.detect_faces(gray_image=gray_image)
+        for face in faces:
+            roi_image = self._get_face_image(face=face, image=image_copy)
+            eyes = self._get_eyes(face=face, gray_image=gray_image)
+            self._draw_googly_eyes(image=roi_image, eyes=eyes)
+
+        _, buffer = cv2.imencode(".jpeg", image_copy)
+        return buffer
