@@ -4,7 +4,7 @@ from unittest.mock import patch
 import numpy as np
 from pytest import fixture
 
-from model.cascade_classifier import CascadeClassifier
+from src.model.cascade_classifier import CascadeClassifier
 
 
 class MockCascadeClassifier:
@@ -15,7 +15,7 @@ class MockCascadeClassifier:
 @fixture
 def mock_cascade_classifier() -> CascadeClassifier:
     with patch(
-        "model.cascade_classifier.cv2.CascadeClassifier",
+        "src.model.cascade_classifier.cv2.CascadeClassifier",
         return_value=MockCascadeClassifier(),
     ):
         return CascadeClassifier(face_model_path=Path(), eyes_model_path=Path())

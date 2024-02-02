@@ -3,7 +3,7 @@
 from flask.testing import FlaskClient
 from pytest import fixture
 
-from app import app
+from src.app import app
 
 
 @fixture
