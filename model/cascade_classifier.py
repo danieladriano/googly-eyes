@@ -27,7 +27,8 @@ class CascadeClassifier:
         )
 
     def detect_eyes(self, gray_image: np.ndarray) -> np.ndarray:
-        """Detect eyes in a gray image, then return the two biggest eyes.
+        """Apply a blur filter on gray image, detect eyes,
+        and then return the two biggest eyes.
 
         Args:
             gray_image (np.ndarray): A gray image to detect eyes.
@@ -35,8 +36,9 @@ class CascadeClassifier:
         Returns:
             np.ndarray: An array of eyes (x, y, w, h)
         """
+        blur_gray_image = cv2.blur(gray_image, ksize=(3, 3))
         eyes = self._eyes_cascade.detectMultiScale(
-            image=gray_image, scaleFactor=1.2, minNeighbors=5
+            image=blur_gray_image, scaleFactor=1.2, minNeighbors=5
         )
 
         eyes = sorted(eyes, key=lambda x: x[2], reverse=True)
