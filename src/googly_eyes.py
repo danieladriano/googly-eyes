@@ -43,16 +43,18 @@ def draw_googly_eyes(image: np.ndarray, eyes: np.ndarray) -> None:
             logging.error("Error drawing eyes: %s", ex)
 
 
-def get_googly_eyes(image: np.ndarray) -> np.ndarray:
+def googlify(image: np.ndarray) -> np.ndarray:
     """Detect faces and eyes in an image and draw googly eyes.
 
     Args:
         image (np.ndarray): image.
     """
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image_copy = image.copy()
+    gray_image = cv2.cvtColor(image_copy, cv2.COLOR_BGR2GRAY)
     faces = cascade_classifier.detect_faces(gray_image=gray_image)
     for x, y, w, h in faces:
         roi_gray_image = gray_image[y : y + h, x : x + w]
-        roi_image = image[y : y + h, x : x + w]
+        roi_image = image_copy[y : y + h, x : x + w]
         eyes = cascade_classifier.detect_eyes(gray_image=roi_gray_image)
         draw_googly_eyes(image=roi_image, eyes=eyes)
+    return image_copy

@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from flask import Flask, Response, make_response, request
 
-from src.googly_eyes import get_googly_eyes
+from src.googly_eyes import googlify
 
 ALLOWED_EXTENSIONS = ("png", "jpg", "jpeg")
 
@@ -42,8 +42,8 @@ def googly_eyes():
 
     file_bytes = np.fromfile(file, np.uint8)
     image = cv2.imdecode(file_bytes, cv2.IMREAD_UNCHANGED)
-    get_googly_eyes(image=image)
-    _, buffer = cv2.imencode(".jpg", image)
+    googlified_image = googlify(image=image)
+    _, buffer = cv2.imencode(".jpg", googlified_image)
 
     response = make_response(buffer.tobytes())
     response.headers["Content-Type"] = "image/jpeg"
