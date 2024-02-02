@@ -53,15 +53,24 @@ class Googlify:
         roi_gray_image = self._get_face_image(face=face, image=gray_image)
         return self._cascade_classifier.detect_eyes(gray_image=roi_gray_image)
 
-    def googlify(self, image_file: FileStorage) -> np.ndarray:
+    def convert_file_storage_to_image(self, image_file: FileStorage) -> np.ndarray:
+        """Convert a file storage to an image.
+
+        Args:
+            image_file (FileStorage): image file storage.
+
+        Returns:
+            np.ndarray: image.
+        """
+        image_bytes = np.fromfile(image_file, np.uint8)
+        return cv2.imdecode(image_bytes, cv2.IMREAD_UNCHANGED)
+
+    def googlify(self, image: np.ndarray) -> np.ndarray:
         """Detect faces and eyes in an image and draw googly eyes.
 
         Args:
             image (np.ndarray): image.
         """
-        image_bytes = np.fromfile(image_file, np.uint8)
-        image = cv2.imdecode(image_bytes, cv2.IMREAD_UNCHANGED)
-
         image_copy = image.copy()
         gray_image = cv2.cvtColor(image_copy, cv2.COLOR_BGR2GRAY)
         faces = self._cascade_classifier.detect_faces(gray_image=gray_image)

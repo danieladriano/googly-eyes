@@ -40,7 +40,8 @@ def googly_eyes():
             status=415,
         )
 
-    buffer = googlify.googlify(image_file=file)
+    image = googlify.convert_file_storage_to_image(image_file=file)
+    buffer = googlify.googlify(image=image)
     response = make_response(buffer.tobytes())
     response.headers["Content-Type"] = "image/jpeg"
     return response
