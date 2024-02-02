@@ -40,7 +40,7 @@ def test_upload_image(client: FlaskClient) -> None:
     file_name = "photo.jpg"
     data = {
         "image": (
-            open("./tests/resources/photo.jpg"),
+            open("./tests/resources/photo.jpg", "rb"),
             file_name,
         )
     }
