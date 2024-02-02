@@ -35,11 +35,20 @@ def load_config_yaml(
 
 
 @dataclass
+class CascadeClassifierConfig:
+    """Cascade Classifier Config"""
+
+    path: str
+    scale_factor: float
+    min_neighbors: int
+
+
+@dataclass
 class AppConfig:
     """App Config"""
 
-    face_model_path: str
-    eyes_model_path: str
+    face_cascade_classifier: CascadeClassifierConfig
+    eyes_cascade_classifier: CascadeClassifierConfig
 
     @classmethod
     def load(cls, config_path: Optional[Path] = None) -> "AppConfig":

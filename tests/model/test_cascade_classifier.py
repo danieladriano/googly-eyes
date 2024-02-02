@@ -1,9 +1,12 @@
+"""Tests for the CascadeClassifier class."""
+
 from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
 from pytest import fixture
 
+from src.config import CascadeClassifierConfig
 from src.model.cascade_classifier import CascadeClassifier
 
 
@@ -18,7 +21,17 @@ def mock_cascade_classifier() -> CascadeClassifier:
         "src.model.cascade_classifier.cv2.CascadeClassifier",
         return_value=MockCascadeClassifier(),
     ):
-        return CascadeClassifier(face_model_path=Path(), eyes_model_path=Path())
+        face_config = CascadeClassifierConfig(
+            path="haarcascade_frontalface_default.xml",
+            scale_factor=1.3,
+            min_neighbors=5,
+        )
+        eyes_config = CascadeClassifierConfig(
+            path="haarcascade_eye.xml",
+            scale_factor=1.2,
+            min_neighbors=5,
+        )
+        return CascadeClassifier(face_config=face_config, eyes_config=eyes_config)
 
 
 def test_detect_eyes(mock_cascade_classifier: CascadeClassifier) -> None:

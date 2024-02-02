@@ -16,17 +16,11 @@ class Googlify:
 
     def __init__(self, config: AppConfig) -> None:
         self._cascade_classifier = CascadeClassifier(
-            face_model_path=config.face_model_path,
-            eyes_model_path=config.eyes_model_path,
+            face_config=config.face_cascade_classifier,
+            eyes_config=config.eyes_cascade_classifier,
         )
 
     def _draw_googly_eyes(self, image: np.ndarray, eyes: np.ndarray) -> None:
-        """Draw googly eyes in an image.
-
-        Args:
-            image (np.ndarray): image to draw googly eyes.
-            eyes (np.ndarray): eyes coordinates.
-        """
         for x, y, w, h in eyes:
 
             try:

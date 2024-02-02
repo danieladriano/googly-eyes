@@ -1,7 +1,5 @@
 """Flask app to detect faces in an image and add googly eyes to them."""
 
-import cv2
-import numpy as np
 from flask import Flask, Response, make_response, request
 
 from src.config import AppConfig
