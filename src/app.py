@@ -10,6 +10,9 @@ ALLOWED_EXTENSIONS = ("png", "jpg", "jpeg")
 app = Flask(__name__)
 googlify = Googlify(config=AppConfig.load())
 
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+
 
 def allowed_file(filename: str) -> bool:
     """Verify if the file extension is allowed
