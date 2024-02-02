@@ -10,6 +10,9 @@ from werkzeug.datastructures import FileStorage
 from src.config import AppConfig
 from src.model.cascade_classifier import CascadeClassifier
 
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
 
 class Googlify:
     """Googlify eyes images"""
@@ -20,33 +23,35 @@ class Googlify:
             eyes_config=config.eyes_cascade_classifier,
         )
 
-    def _draw_googly_eyes(
-        self, image: np.ndarray, face: List[np.ndarray], eyes: np.ndarray
-    ) -> None:
-        for x, y, w, h in eyes:
-            x = x + face[0]
-            y = y + face[1]
-            try:
-                center = (int(x + w / 2), int(y + h / 2))
-                radius = int(w * (0.4 + random.random()))
-            except ArithmeticError:
-                center = (x, y)
-                radius = w
+    def _draw_eyeball(self, image: np.ndarray, eye: np.ndarray) -> None:
+        (x, y, w, h) = eye
+        center = (x + w // 2, y + h // 2)
+        radius = max(w, h)
+        cv2.circle(
+            img=image,
+            center=center,
+            radius=radius,
+            color=WHITE,
+            thickness=-1,
+        )
 
-            cv2.circle(
-                img=image,
-                center=center,
-                radius=radius,
-                color=(255, 255, 255),
-                thickness=-1,
-            )
-            cv2.circle(
-                img=image,
-                center=center,
-                radius=int(radius / 2),
-                color=(0, 0, 0),
-                thickness=-1,
-            )
+    def _draw_pupil(self, image: np.ndarray, eye: np.ndarray) -> None:
+        (x, y, w, h) = eye
+        pupil_radius = int(max(w, h) * 0.5)
+        pupil_center_x = x + w // 2 + random.randint(-w // 2, w // 2)
+        pupil_center_y = y + h // 2 + random.randint(-h // 2, h // 2)
+        cv2.circle(
+            img=image,
+            center=(pupil_center_x, pupil_center_y),
+            radius=pupil_radius,
+            color=BLACK,
+            thickness=-1,
+        )
+
+    def _draw_googly_eyes(self, image: np.ndarray, eyes: np.ndarray) -> None:
+        for eye in eyes:
+            self._draw_eyeball(image=image, eye=eye)
+            self._draw_pupil(image=image, eye=eye)
 
     def _get_face_image(self, face: np.ndarray, image: np.ndarray) -> np.ndarray:
         (x, y, w, h) = face
@@ -55,6 +60,11 @@ class Googlify:
     def _get_eyes(self, face: np.ndarray, gray_image: np.ndarray) -> List[np.ndarray]:
         roi_gray_image = self._get_face_image(face=face, image=gray_image)
         return self._cascade_classifier.detect_eyes(gray_image=roi_gray_image)
+
+    def _transform_eyes_to_face_coordinates(
+        self, face: np.ndarray, eyes: np.ndarray
+    ) -> List[np.ndarray]:
+        return [(x + face[0], y + face[1], h, w) for x, y, h, w in eyes]
 
     def convert_file_storage_to_image(self, image_file: FileStorage) -> np.ndarray:
         """Convert a file storage to an image.
@@ -79,7 +89,8 @@ class Googlify:
         faces = self._cascade_classifier.detect_faces(gray_image=gray_image)
         for face in faces:
             eyes = self._get_eyes(face=face, gray_image=gray_image)
-            self._draw_googly_eyes(image=image_copy, face=face, eyes=eyes)
+            eyes = self._transform_eyes_to_face_coordinates(face=face, eyes=eyes)
+            self._draw_googly_eyes(image=image_copy, eyes=eyes)
 
         _, buffer = cv2.imencode(".jpeg", image_copy)
         return buffer

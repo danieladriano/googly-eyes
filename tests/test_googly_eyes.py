@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+import cv2
 import numpy as np
 
 from src.googly_eyes import Googlify
@@ -24,16 +25,38 @@ def test_get_eyes(mock_googlify: Googlify) -> None:
     assert all(len(eye) == 4 for eye in result)
 
 
-def test_draw_googly_eyes(mock_googlify: Googlify) -> None:
+def test_transform_eyes_to_face_coordinates(mock_googlify: Googlify) -> None:
+    """Test _transform_eyes_to_face_coordinates method."""
+    face = np.array([10, 20, 30, 40])
+    eyes = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
+    expected_result = [(11, 22, 3, 4), (15, 26, 7, 8)]
+
+    result = mock_googlify._transform_eyes_to_face_coordinates(face, eyes)
+
+    assert result == expected_result
+
+
+def test_draw_eyeball(mock_googlify: Googlify) -> None:
+    """Test Googlify class."""
+    image = np.zeros((100, 100, 3), dtype=np.uint8)
+    eye = np.array([10, 20, 30, 40])
+
+    mock_googlify._draw_eyeball(image=image, eye=eye)
+
+    assert image.shape == (100, 100, 3)
+    assert np.array_equal(image[20:60, 10:40], np.full((40, 30, 3), 255))
+
+
+def test_draw_pupil(mock_googlify: Googlify) -> None:
     """Test Googlify class."""
     image = np.zeros((100, 100, 3), dtype=np.uint8)
     image[:, :] = (255, 0, 0)
-    eyes = np.array([[10, 20, 30, 40], [50, 60, 70, 80]])
-    face = np.array([10, 20, 30, 40])
+    eye = np.array([10, 20, 30, 40])
 
-    mock_googlify._draw_googly_eyes(image=image, face=face, eyes=eyes)
+    mock_googlify._draw_pupil(image=image, eye=eye)
 
-    assert image.shape == (100, 100, 3)
+    image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    assert cv2.countNonZero(image_gray) == 8743
 
 
 def test_googlify(mock_googlify: Googlify) -> None:
