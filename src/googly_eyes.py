@@ -20,12 +20,15 @@ class Googlify:
             eyes_config=config.eyes_cascade_classifier,
         )
 
-    def _draw_googly_eyes(self, image: np.ndarray, eyes: np.ndarray) -> None:
+    def _draw_googly_eyes(
+        self, image: np.ndarray, face: List[np.ndarray], eyes: np.ndarray
+    ) -> None:
         for x, y, w, h in eyes:
-
+            x = x + face[0]
+            y = y + face[1]
             try:
                 center = (int(x + w / 2), int(y + h / 2))
-                radius = int(w * (0.7 + random.random()))
+                radius = int(w * (0.4 + random.random()))
             except ArithmeticError:
                 center = (x, y)
                 radius = w
@@ -75,9 +78,8 @@ class Googlify:
         gray_image = cv2.cvtColor(image_copy, cv2.COLOR_BGR2GRAY)
         faces = self._cascade_classifier.detect_faces(gray_image=gray_image)
         for face in faces:
-            roi_image = self._get_face_image(face=face, image=image_copy)
             eyes = self._get_eyes(face=face, gray_image=gray_image)
-            self._draw_googly_eyes(image=roi_image, eyes=eyes)
+            self._draw_googly_eyes(image=image_copy, face=face, eyes=eyes)
 
         _, buffer = cv2.imencode(".jpeg", image_copy)
         return buffer

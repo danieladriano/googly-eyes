@@ -29,8 +29,9 @@ def test_draw_googly_eyes(mock_googlify: Googlify) -> None:
     image = np.zeros((100, 100, 3), dtype=np.uint8)
     image[:, :] = (255, 0, 0)
     eyes = np.array([[10, 20, 30, 40], [50, 60, 70, 80]])
+    face = np.array([10, 20, 30, 40])
 
-    mock_googlify._draw_googly_eyes(image, eyes)
+    mock_googlify._draw_googly_eyes(image=image, face=face, eyes=eyes)
 
     assert image.shape == (100, 100, 3)
 
