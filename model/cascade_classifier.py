@@ -1,6 +1,7 @@
 """Cascade classifier to detect faces and eyes."""
 
 from pathlib import Path
+from typing import List
 
 import cv2
 import numpy as np
@@ -26,7 +27,7 @@ class CascadeClassifier:
             image=gray_image, scaleFactor=1.3, minNeighbors=5
         )
 
-    def detect_eyes(self, gray_image: np.ndarray) -> np.ndarray:
+    def detect_eyes(self, gray_image: np.ndarray) -> List[np.ndarray]:
         """Apply a blur filter on gray image, detect eyes,
         and then return the two biggest eyes.
 
