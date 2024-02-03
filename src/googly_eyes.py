@@ -9,6 +9,7 @@ from werkzeug.datastructures import FileStorage
 
 from src.cascade_classifier import CascadeClassifier
 from src.config import AppConfig
+from src.errors import NoEyesDetectedError, NoFacesDetectedError
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -87,8 +88,16 @@ class Googlify:
         image_copy = image.copy()
         gray_image = cv2.cvtColor(image_copy, cv2.COLOR_BGR2GRAY)
         faces = self._cascade_classifier.detect_faces(gray_image=gray_image)
+
+        if len(faces) == 0:
+            raise NoFacesDetectedError()
+
         for face in faces:
             eyes = self._get_eyes(face=face, gray_image=gray_image)
+
+            if not eyes:
+                raise NoEyesDetectedError()
+
             eyes = self._transform_eyes_to_face_coordinates(face=face, eyes=eyes)
             self._draw_googly_eyes(image=image_copy, eyes=eyes)
 

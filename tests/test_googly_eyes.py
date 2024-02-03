@@ -4,7 +4,9 @@ from unittest.mock import patch
 
 import cv2
 import numpy as np
+import pytest
 
+from src.errors import NoEyesDetectedError, NoFacesDetectedError
 from src.googly_eyes import Googlify
 
 
@@ -72,3 +74,29 @@ def test_googlify(mock_googlify: Googlify) -> None:
         result = mock_googlify.googlify(image)
 
     assert result.shape == (1651,)
+
+
+def test_no_faces_detected(mock_googlify: Googlify) -> None:
+    """Test Googlify class."""
+    image = np.zeros((255, 255, 3), dtype=np.uint8)
+    with patch(
+        "src.googly_eyes.CascadeClassifier.detect_faces",
+        return_value=np.array([]),
+    ):
+        with pytest.raises(NoFacesDetectedError):
+            mock_googlify.googlify(image)
+
+
+def test_no_eyes_detected(mock_googlify: Googlify) -> None:
+    """Test Googlify class."""
+    image = np.zeros((255, 255, 3), dtype=np.uint8)
+    with patch(
+        "src.googly_eyes.CascadeClassifier.detect_faces",
+        return_value=np.array([[10, 20, 50, 60]]),
+    ):
+        with patch(
+            "src.googly_eyes.CascadeClassifier.detect_eyes",
+            return_value=np.array([]),
+        ):
+            with pytest.raises(NoEyesDetectedError):
+                mock_googlify.googlify(image)

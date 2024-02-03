@@ -3,6 +3,7 @@
 from flask import Flask, Response, make_response, request
 
 from src.config import AppConfig
+from src.errors import NoEyesDetectedError, NoFacesDetectedError
 from src.googly_eyes import Googlify
 
 ALLOWED_EXTENSIONS = ("png", "jpg", "jpeg")
@@ -28,11 +29,15 @@ def googly_eyes():
             status=415,
         )
 
-    image = googlify.convert_file_storage_to_image(image_file=file)
-    buffer = googlify.googlify(image=image)
-    response = make_response(buffer.tobytes())
-    response.headers["Content-Type"] = "image/jpeg"
-    return response
+    try:
+        image = googlify.convert_file_storage_to_image(image_file=file)
+        buffer = googlify.googlify(image=image)
+        response = make_response(buffer.tobytes())
+        response.headers["Content-Type"] = "image/jpeg"
+        return response
+    except (NoFacesDetectedError, NoEyesDetectedError) as ex:
+        app.logger.warning(ex.message)
+        return Response(ex.message, status=400)
 
 
 if __name__ == "__main__":
