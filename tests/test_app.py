@@ -13,7 +13,7 @@ def test_image_post_key_not_present(client: FlaskClient) -> None:
     """
     file_name = "fake_file.txt"
     data = {"fake": (io.BytesIO(b"Some text"), file_name)}
-    response = client.post("/googly_eyes", data=data)
+    response = client.post("/googly-eyes", data=data)
     assert response.status_code == 500
 
 
@@ -27,7 +27,7 @@ def test_upload_text_file(client: FlaskClient) -> None:
 
     file_name = "fake_file.txt"
     data = {"image": (io.BytesIO(b"Some text"), file_name)}
-    response = client.post("/googly_eyes", data=data)
+    response = client.post("/googly-eyes", data=data)
     assert response.status_code == 415
 
 
@@ -44,5 +44,5 @@ def test_upload_image(client: FlaskClient) -> None:
             file_name,
         )
     }
-    response = client.post("/googly_eyes", data=data)
+    response = client.post("/googly-eyes", data=data)
     assert response.status_code == 200

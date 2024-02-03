@@ -76,7 +76,7 @@ class Googlify:
             np.ndarray: image.
         """
         image_bytes = np.fromfile(image_file, np.uint8)
-        return cv2.imdecode(image_bytes, cv2.IMREAD_UNCHANGED)
+        return cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
 
     def googlify(self, image: np.ndarray) -> np.ndarray:
         """Detect faces and eyes in an image and draw googly eyes.

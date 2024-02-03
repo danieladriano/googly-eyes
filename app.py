@@ -11,29 +11,17 @@ app = Flask(__name__)
 googlify = Googlify(config=AppConfig.load())
 
 
-def allowed_file(filename: str) -> bool:
-    """Verify if the file extension is allowed
-
-    Args:
-        filename (str): filename
-
-    Returns:
-        bool: return true if the file extension is allowed
-    """
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-@app.route("/googly_eyes", methods=["POST"])
+@app.route("/googly-eyes", methods=["POST"])
 def googly_eyes():
     """Receive an image and return the same image with googly eyes."""
-    try:
-        file = request.files["image"]
-        app.logger.info("Received image: %s", file.filename)
-    except KeyError:
+    if "image" not in request.files:
         app.logger.error("Image not present at request.")
         return Response("It's necessary to send a image.", status=500)
 
-    if not allowed_file(file.filename):
+    file = request.files["image"]
+    app.logger.info("Received image: %s", file.filename)
+
+    if not file.content_type in ("image/png", "image/jpeg"):
         app.logger.error("Not a %s file", ALLOWED_EXTENSIONS)
         return Response(
             response=f"Only {ALLOWED_EXTENSIONS} formarts are allowed!",
