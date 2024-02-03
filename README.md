@@ -1,5 +1,7 @@
 # Googly Eyes
 
+![sample output](sample/googly-eyes.jpeg)
+
 The objective of this service is to receive an image, find the faces and eyes, replace the eyes with googly eyes, and then return the image.
 
 Only `jpeg`, `jpg`, and `png` image formats are allowed.
