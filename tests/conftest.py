@@ -7,9 +7,9 @@ from flask.testing import FlaskClient
 from pytest import fixture
 
 from app import app
+from src.cascade_classifier import CascadeClassifier
 from src.config import AppConfig
 from src.googly_eyes import Googlify
-from src.model.cascade_classifier import CascadeClassifier
 
 
 @fixture
@@ -31,7 +31,7 @@ class MockCascadeClassifier:
 def mock_cascade_classifier() -> CascadeClassifier:
     """Mock cascade classifier"""
     with patch(
-        "src.model.cascade_classifier.cv2.CascadeClassifier",
+        "src.cascade_classifier.cv2.CascadeClassifier",
         return_value=MockCascadeClassifier(),
     ):
         app_config = AppConfig.load("./tests/resources/config.yml")

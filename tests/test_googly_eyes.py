@@ -1,3 +1,5 @@
+"""Test Googlify class."""
+
 from unittest.mock import patch
 
 import cv2

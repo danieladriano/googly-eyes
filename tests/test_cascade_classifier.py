@@ -1,12 +1,8 @@
 """Tests for the CascadeClassifier class."""
 
-from unittest.mock import patch
-
 import numpy as np
-from pytest import fixture
 
-from src.config import AppConfig
-from src.model.cascade_classifier import CascadeClassifier
+from src.cascade_classifier import CascadeClassifier
 
 
 def test_detect_eyes(mock_cascade_classifier: CascadeClassifier) -> None:

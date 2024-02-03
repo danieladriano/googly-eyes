@@ -7,8 +7,8 @@ import cv2
 import numpy as np
 from werkzeug.datastructures import FileStorage
 
+from src.cascade_classifier import CascadeClassifier
 from src.config import AppConfig
-from src.model.cascade_classifier import CascadeClassifier
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
