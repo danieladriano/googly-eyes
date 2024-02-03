@@ -1,5 +1,6 @@
 """Googlify eyes"""
 
+import logging
 import random
 from typing import List
 
@@ -92,14 +93,20 @@ class Googlify:
         if len(faces) == 0:
             raise NoFacesDetectedError()
 
+        at_least_one_eye_detected = False
         for face in faces:
             eyes = self._get_eyes(face=face, gray_image=gray_image)
 
             if not eyes:
-                raise NoEyesDetectedError()
+                logging.warning("No eyes detected in face %s", face)
+                continue
 
+            at_least_one_eye_detected = True
             eyes = self._transform_eyes_to_face_coordinates(face=face, eyes=eyes)
             self._draw_googly_eyes(image=image_copy, eyes=eyes)
+
+        if not at_least_one_eye_detected:
+            raise NoEyesDetectedError()
 
         _, buffer = cv2.imencode(".jpeg", image_copy)
         return buffer
