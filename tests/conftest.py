@@ -6,7 +6,7 @@ import numpy as np
 from flask.testing import FlaskClient
 from pytest import fixture
 
-from src.app import app
+from app import app
 from src.config import AppConfig
 from src.googly_eyes import Googlify
 from src.model.cascade_classifier import CascadeClassifier

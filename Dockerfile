@@ -19,10 +19,10 @@ COPY pyproject.toml poetry.lock ${WORKING_DIR_PATH}/
 RUN poetry install --only main --no-root && rm -rf $POETRY_CACHE_DIR
 
 COPY src ${WORKING_DIR_PATH}/src
-RUN rm ${WORKING_DIR_PATH}/src/app.py
-COPY src/app.py ${WORKING_DIR_PATH}/
+COPY app.py ${WORKING_DIR_PATH}/
+COPY gunicorn.conf.py ${WORKING_DIR_PATH}/
 COPY config.yml ${WORKING_DIR_PATH}/
 COPY data ${WORKING_DIR_PATH}/data
 
 EXPOSE 5000
-ENTRYPOINT [ "poetry", "run", "python", "app.py"]
+ENTRYPOINT [ "poetry", "run", "gunicorn", "app:app"]
