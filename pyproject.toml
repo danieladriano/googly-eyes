@@ -1,35 +1,16 @@
-[tool.poetry]
+[project]
 name = "googly-eyes"
 version = "0.1.0"
 description = "Googly Eyes"
-authors = ["Daniel Adriano <daniel.dadriano@gmail.com>"]
-license = "Apache 2.0"
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-flask = "^3.0.1"
-numpy = "^1.26.3"
-opencv-python = "^4.9.0.80"
-dacite = "^1.8.1"
-pyyaml = "^6.0.1"
-gunicorn = "^21.2.0"
-
-
-[tool.poetry.group.dev.dependencies]
-black = "^24.1.1"
-isort = "^5.13.2"
-pytest = "^8.0.0"
-pytest-cov = "^4.1.0"
-
-
-[tool.pylint.typecheck]
-# List of members which are set dynamically and missed by pylint inference
-# system, and so shouldn't trigger E1101 when accessed. Python regular
-# expressions are accepted.
-generated-members = ["cv2.*"]
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires-python = ">=3.10"
+dependencies = [
+    "dacite==1.8.1",
+    "flask==3.0.1",
+    "gunicorn==21.2.0",
+    "numpy==1.26.3",
+    "opencv-python==4.9.0.80",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "pyyaml==6.0.1",
+]

@@ -1,4 +1,4 @@
-FROM python:3.10.13-slim-bookworm as base
+FROM python:3.10.13-slim-bookworm AS base
 
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
@@ -15,7 +15,8 @@ ENV WORKING_DIR_PATH=/app
 RUN mkdir $WORKING_DIR_PATH
 WORKDIR ${WORKING_DIR_PATH}
 
-COPY pyproject.toml poetry.lock ${WORKING_DIR_PATH}/
+COPY pyproject-poetry.toml poetry.lock ${WORKING_DIR_PATH}/
+RUN mv pyproject-poetry.toml pyproject.toml
 RUN poetry install --only main --no-root && rm -rf $POETRY_CACHE_DIR
 
 COPY src ${WORKING_DIR_PATH}/src

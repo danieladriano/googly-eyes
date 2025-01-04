@@ -12,16 +12,16 @@ Receive an image, detect faces, get the image face roi, and detect eyes. With th
 
 ### Getting started
 
-The project uses [Poetry](https://python-poetry.org/) version 1.7.1 as a dependency management tool.
+The project uses [uv](https://docs.astral.sh/uv/) version 0.5.14 as a dependency management tool.
 
 Create a development environment:
 ```
-poetry install
+uv sync
 ```
 
 Run the project:
 ```
-poetry run flask --app app run --debug
+uv run flask --app app run --debug
 ```
 
 Invoke the endpoint `/googly-eyes`:
@@ -36,7 +36,7 @@ Replace `<IMAGE_PATH>` with the image path to googlify. A `result.jpeg` image wi
 To run the unit tests:
 
 ```
-poetry run pytest --cov=app --cov=src tests;
+uv run pytest --cov=app --cov=src tests;
 ```
 
 Test coverage is currently at 97%
